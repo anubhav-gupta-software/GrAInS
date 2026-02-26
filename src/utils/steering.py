@@ -71,6 +71,92 @@ def add_steering_hook(model, layer_idx, steering_vec, alpha=1.0):
     return hook_handles
 
 
+def generate_answer_dataset(dataset, model, tokenizer, max_new_tokens=128, temperature=0.1):
+    """Generate free-form answers for an LLM dataset (no steering)."""
+    outputs = []
+    do_sample = temperature > 0
+
+    for example in tqdm(dataset, desc="Generating (base)"):
+        question = example["question"].strip()
+        prompt = f"Q: {question}\nA:"
+        input_ids = tokenizer(prompt, return_tensors="pt").to(model.device)["input_ids"]
+
+        with torch.no_grad():
+            gen_ids = model.generate(
+                input_ids,
+                max_new_tokens=max_new_tokens,
+                temperature=temperature if do_sample else None,
+                do_sample=do_sample,
+            )
+
+        new_tokens = gen_ids[0, input_ids.shape[1]:]
+        outputs.append(tokenizer.decode(new_tokens, skip_special_tokens=True).strip())
+
+    return outputs
+
+
+def steer_and_generate_dataset(dataset, model, tokenizer, steering_vec,
+                               layer_idx, alpha=1.0, max_new_tokens=128, temperature=0.1):
+    """Generate free-form answers for an LLM dataset with a steering vector applied."""
+    hook_handles = add_steering_hook(model, layer_idx, steering_vec, alpha)
+    try:
+        outputs = generate_answer_dataset(
+            dataset, model, tokenizer,
+            max_new_tokens=max_new_tokens,
+            temperature=temperature,
+        )
+    finally:
+        for handle in hook_handles:
+            handle.remove()
+    return outputs
+
+
+def generate_answer_dataset_vlm(dataset, model, processor, max_new_tokens=256, temperature=0.1):
+    """Generate free-form answers for a VLM dataset (no steering)."""
+    outputs = []
+    do_sample = temperature > 0
+
+    for example in tqdm(dataset, desc="Generating VLM (base)"):
+        question = example["question"].strip()
+        image = example["image"]
+
+        messages = [{
+            "role": "user",
+            "content": [{"type": "text", "text": question}, {"type": "image"}],
+        }]
+        prompt = processor.apply_chat_template(messages, add_generation_prompt=True)
+        inputs = processor(images=image, text=prompt, return_tensors="pt").to(model.device)
+
+        with torch.no_grad():
+            gen_ids = model.generate(
+                **inputs,
+                max_new_tokens=max_new_tokens,
+                temperature=temperature if do_sample else None,
+                do_sample=do_sample,
+            )
+
+        new_tokens = gen_ids[0, inputs["input_ids"].shape[1]:]
+        outputs.append(processor.decode(new_tokens, skip_special_tokens=True).strip())
+
+    return outputs
+
+
+def steer_and_generate_dataset_vlm(dataset, model, processor, steering_vec,
+                                   layer_idx, alpha=1.0, max_new_tokens=256, temperature=0.1):
+    """Generate free-form answers for a VLM dataset with a steering vector applied."""
+    hook_handles = add_steering_hook(model, layer_idx, steering_vec, alpha)
+    try:
+        outputs = generate_answer_dataset_vlm(
+            dataset, model, processor,
+            max_new_tokens=max_new_tokens,
+            temperature=temperature,
+        )
+    finally:
+        for handle in hook_handles:
+            handle.remove()
+    return outputs
+
+
 def evaluate(dataset, model, tokenizer):
     """Compute MC accuracy for LLMs."""
     correct, all_probs, all_labels = 0, [], []
