@@ -1,3 +1,9 @@
+'''did the four missing functions that
+steering_generation.py and steering_generation_vlm.py depend on:
+- generate_answer_dataset
+- steer_and_generate_dataset
+- generate_answer_dataset_vlm
+- steer_and_generate_dataset_vlm'''
 import numpy as np
 import torch
 from torch.nn.functional import log_softmax
