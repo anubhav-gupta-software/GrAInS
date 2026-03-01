@@ -5,7 +5,7 @@ DATASET_NAME="truthfulqa"
 MODEL_NAME="llama-3.1-8b-instruct"  # qwen-2.5-7b-instruct
 NUM_SAMPLES=50
 ATTRIBUTION="contrastive"
-GRAD_METHOD="vanilla"  # integrated_gradients 
+GRAD_METHOD="integrated_gradients"  # integrated_gradients 
 SPLIT="validation"
 OUTPUT_DIR_META="results/llm/token_attribution"
 OUTPUT_DIR_HIDDEN="data/llm/hidden_states"
@@ -23,7 +23,7 @@ for TOP_K in "${TOP_K_VALUES[@]}"; do
   for TOP in "${TOP_VALUES[@]}"; do
     echo "Running with TOP_K=$TOP_K and TOP=$TOP"
     
-    python token_ablation.py \
+    python3 token_ablation.py \
       --dataset_name $DATASET_NAME \
       --model_name $MODEL_NAME \
       --num_samples $NUM_SAMPLES \

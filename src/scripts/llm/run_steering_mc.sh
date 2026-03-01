@@ -27,7 +27,7 @@ OUTPUT_DIR="results/llm/steering"
 STEERING_VECTOR_DIR="data/llm/steering_vectors"
 
 # Run the script
-python steering_mc.py \
+python3 steering_mc.py \
   --dataset_name "$DATASET_NAME" \
   --model_name "$MODEL_NAME" \
   --num_samples "$NUM_SAMPLES" \

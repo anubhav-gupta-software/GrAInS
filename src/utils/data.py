@@ -2,49 +2,20 @@ from datasets import load_dataset
 
 
 def load_truthful_qa(num_samples=50, split="validation"):
-    """Load samples from the TruthfulQA dataset."""
-    if num_samples == "all":
-        dataset = load_dataset("EleutherAI/truthful_qa_binary", split=split)
-    else:
-        dataset = load_dataset(
-            "EleutherAI/truthful_qa_binary", split=f"{split}[:{num_samples}]"
-        )
-    return dataset
-
-
-def load_faitheval(num_samples=50, split="test"):
-    """Load samples from the FaithEval dataset."""
-    dataset = load_dataset("Salesforce/FaithEval-counterfactual-v1.0", split=split)
+    ds = load_dataset("truthful_qa", "multiple_choice", split=split)
+    def transform(example):
+        choices = example["mc1_targets"]["choices"]
+        labels = example["mc1_targets"]["labels"]
+        label = labels.index(1)
+        return {"question": example["question"], "choices": choices, "label": label}
+    ds = ds.map(transform, remove_columns=ds.column_names)
     if num_samples != "all":
-        dataset = dataset.select(range(int(num_samples)))
-    return dataset
-
-
-def load_spa_vl(num_samples=50, split="validation"):
-    """Load samples from the SPA-VL dataset."""
-    dataset = load_dataset("sqrti/SPA-VL", split)[split]
-    if num_samples != "all":
-        dataset = dataset.select(range(int(num_samples)))
-    return dataset
-
-
-def load_mmhal_bench(num_samples=50, split="test"):
-    """Load samples from the MMHal-Bench dataset."""
-    dataset = load_dataset("MMHal-Bench.py")[split]
-    if num_samples != "all":
-        dataset = dataset.select(range(int(num_samples)))
-    return dataset
+        ds = ds.select(range(min(int(num_samples), len(ds))))
+    return ds
 
 
 def load_data(dataset_name, num_samples=50, split="validation"):
-    """Generic loader to fetch datasets by name."""
     if dataset_name == "truthfulqa":
         return load_truthful_qa(num_samples=num_samples, split=split)
-    elif dataset_name == "faitheval":
-        return load_faitheval(num_samples=num_samples, split=split)
-    elif dataset_name == "spa-vl":
-        return load_spa_vl(num_samples=num_samples, split=split)
-    elif dataset_name == "mmhal-bench":
-        return load_mmhal_bench(num_samples=num_samples, split=split)
     else:
         raise ValueError(f"Dataset '{dataset_name}' is not supported.")
