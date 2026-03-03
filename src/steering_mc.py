@@ -38,7 +38,7 @@ def run_single_eval(args, method, layer_idx, alpha, mode):
         dataset=args.dataset,
         model=args.model,
         tokenizer=args.tokenizer,
-        steering_vector=steering_vec,
+        steering_vec=steering_vec,
         layer_idx=layer_idx,
         alpha=alpha
     )
