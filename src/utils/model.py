@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 from torch.nn.functional import log_softmax
 from transformers import (
