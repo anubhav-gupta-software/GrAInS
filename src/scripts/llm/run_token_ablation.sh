@@ -23,7 +23,7 @@ for TOP_K in "${TOP_K_VALUES[@]}"; do
   for TOP in "${TOP_VALUES[@]}"; do
     echo "Running with TOP_K=$TOP_K and TOP=$TOP"
     
-    python token_ablation.py \
+    python3 token_ablation.py \
       --dataset_name $DATASET_NAME \
       --model_name $MODEL_NAME \
       --num_samples $NUM_SAMPLES \

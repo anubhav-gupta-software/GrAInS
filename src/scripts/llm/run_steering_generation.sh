@@ -31,7 +31,7 @@ TEMPERATURE=0.1
 MAX_NEW_TOKENS=256
 
 # Run the script
-python steering_generation.py \
+python3 steering_generation.py \
   --dataset_name "$DATASET_NAME" \
   --model_name "$MODEL_NAME" \
   --num_samples "$NUM_SAMPLES" \
