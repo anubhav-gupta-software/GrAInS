@@ -10,7 +10,7 @@ SPLIT="validation"
 NUM_SAMPLES_STEER=50
 ATTRIBUTION="contrastive"
 GRAD_METHOD="integrated_gradients"  # vanilla 
-K=10
+K=3
 
 # Paths to hidden states
 HIDDEN_STATES_PATH="data/llm/hidden_states/hidden_states_${DATASET_NAME}_${MODEL_NAME}_${NUM_SAMPLES_STEER}_${ATTRIBUTION}_${K}_pos_${GRAD_METHOD}.npz"
@@ -18,9 +18,9 @@ HIDDEN_STATES_NEG_PATH="data/llm/hidden_states/hidden_states_${DATASET_NAME}_${M
 
 # Parameters
 MODES=("both")
-METHODS=("pca")
-LAYER_IDXS=(31) # 27
-ALPHAS=(4.0)
+METHODS=("pca" "mean")
+LAYER_IDXS=(28 29 30 31)
+ALPHAS=(2.0 4.0 6.0 8.0)
 
 # Output directory
 OUTPUT_DIR="results/llm/steering"
