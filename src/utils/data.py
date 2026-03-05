@@ -1,13 +1,17 @@
 from datasets import load_dataset
 
 
-def load_truthful_qa(num_samples=50, split="validation"):
+def load_truthful_qa(num_samples=50, split="validation", offset=0):
     """Load samples from the TruthfulQA dataset."""
     if num_samples == "all":
-        dataset = load_dataset("EleutherAI/truthful_qa_binary", split=split)
+        if offset > 0:
+            dataset = load_dataset("EleutherAI/truthful_qa_binary", split=f"{split}[{offset}:]")
+        else:
+            dataset = load_dataset("EleutherAI/truthful_qa_binary", split=split)
     else:
+        end = offset + int(num_samples)
         dataset = load_dataset(
-            "EleutherAI/truthful_qa_binary", split=f"{split}[:{num_samples}]"
+            "EleutherAI/truthful_qa_binary", split=f"{split}[{offset}:{end}]"
         )
     return dataset
 
@@ -36,10 +40,10 @@ def load_mmhal_bench(num_samples=50, split="test"):
     return dataset
 
 
-def load_data(dataset_name, num_samples=50, split="validation"):
+def load_data(dataset_name, num_samples=50, split="validation", offset=0):
     """Generic loader to fetch datasets by name."""
     if dataset_name == "truthfulqa":
-        return load_truthful_qa(num_samples=num_samples, split=split)
+        return load_truthful_qa(num_samples=num_samples, split=split, offset=offset)
     elif dataset_name == "faitheval":
         return load_faitheval(num_samples=num_samples, split=split)
     elif dataset_name == "spa-vl":
