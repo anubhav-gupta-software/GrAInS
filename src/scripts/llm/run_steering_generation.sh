@@ -5,6 +5,7 @@ DATASET_NAME="truthfulqa"
 MODEL_NAME="llama-3.1-8b-instruct"  # qwen-2.5-7b-instruct
 NUM_SAMPLES="all"
 SPLIT="validation"
+OFFSET=127  # Skip 50 steering + 77 dev, evaluate on test set only
 
 # Attribution and steering config
 NUM_SAMPLES_STEER=50
@@ -36,6 +37,7 @@ python3 steering_generation.py \
   --model_name "$MODEL_NAME" \
   --num_samples "$NUM_SAMPLES" \
   --split "$SPLIT" \
+  --offset "$OFFSET" \
   --hidden_states_path "$HIDDEN_STATES_PATH" \
   --hidden_states_neg_path "$HIDDEN_STATES_NEG_PATH" \
   --top_k "$K" \
