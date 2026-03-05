@@ -58,7 +58,7 @@ def run_single_eval(args, method, layer_idx, alpha, mode):
 def main(args):
     print("Loading model and dataset...")
     model, tokenizer = load_llm_model_and_tokenizer(MODEL_NAME_MAP[args.model_name])
-    dataset = load_data(args.dataset_name, args.num_samples, args.split)
+    dataset = load_data(args.dataset_name, args.num_samples, args.split, offset=args.offset)
 
     # Attach model components to args for convenience
     args.model = model
@@ -109,6 +109,7 @@ if __name__ == "__main__":
     parser.add_argument("--model_name", type=str, default="llama-3.1-8b", help="Model identifier")
     parser.add_argument("--num_samples", type=str, default="all", help="Number of samples to evaluate")
     parser.add_argument("--split", type=str, default="validation", help="Dataset split")
+    parser.add_argument("--offset", type=int, default=0, help="Number of samples to skip (for excluding steering samples)")
 
     # Paths
     parser.add_argument("--hidden_states_path", type=str, default="data/hidden_states", help="Path to positive hidden states")
