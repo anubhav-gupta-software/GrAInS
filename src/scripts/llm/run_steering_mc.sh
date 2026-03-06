@@ -1,4 +1,5 @@
 #!/bin/bash
+# Uses short prompt "Q: {question}\nA:" per paper (base ~34%, steered ~47-62%)
 
 # Set default values
 DATASET_NAME="truthfulqa"

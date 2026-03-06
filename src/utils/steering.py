@@ -11,8 +11,6 @@ from sklearn.decomposition import PCA
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
-from utils.config import PROMPT_MAP
-
 
 def load_hidden_states(hidden_states_path):
     """Load hidden states from a file."""
@@ -174,10 +172,7 @@ def evaluate(dataset, model, tokenizer, dataset_name="truthfulqa"):
         choices = example["choices"]
         label = example["label"]
 
-        if dataset_name == "truthfulqa":
-            prompt = PROMPT_MAP["truthfulqa"].format(question=question).strip()
-        else:
-            prompt = f"Q: {question}\nA:"
+        prompt = f"Q: {question}\nA:"
         scores = []
 
         for choice in choices:
