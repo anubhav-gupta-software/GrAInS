@@ -11,6 +11,8 @@ from sklearn.decomposition import PCA
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
+from utils.config import PROMPT_MAP
+
 
 def load_hidden_states(hidden_states_path):
     """Load hidden states from a file."""
@@ -163,7 +165,7 @@ def steer_and_generate_dataset_vlm(dataset, model, processor, steering_vec,
     return outputs
 
 
-def evaluate(dataset, model, tokenizer):
+def evaluate(dataset, model, tokenizer, dataset_name="truthfulqa"):
     """Compute MC accuracy for LLMs."""
     correct, all_probs, all_labels = 0, [], []
 
@@ -172,7 +174,10 @@ def evaluate(dataset, model, tokenizer):
         choices = example["choices"]
         label = example["label"]
 
-        prompt = f"Q: {question}\nA:"
+        if dataset_name == "truthfulqa":
+            prompt = PROMPT_MAP["truthfulqa"].format(question=question).strip()
+        else:
+            prompt = f"Q: {question}\nA:"
         scores = []
 
         for choice in choices:
@@ -194,11 +199,11 @@ def evaluate(dataset, model, tokenizer):
     return accuracy, all_probs, all_labels
 
 
-def evaluate_steering(dataset, model, tokenizer, steering_vec, layer_idx, alpha=1.0):
+def evaluate_steering(dataset, model, tokenizer, steering_vec, layer_idx, alpha=1.0, dataset_name="truthfulqa"):
     """Compute MC accuracy for steering LLMs."""
     hook_handles = add_steering_hook(model, layer_idx, steering_vec, alpha)
     print(f"\nEvaluating steered model (layer {layer_idx}, alpha={alpha})...")
-    acc, all_probs, all_labels = evaluate(dataset, model, tokenizer)
+    acc, all_probs, all_labels = evaluate(dataset, model, tokenizer, dataset_name=dataset_name)
     for handle in hook_handles:
         handle.remove()
     print(f"\nMC1 Accuracy with steering: {acc:.4f}")

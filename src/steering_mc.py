@@ -40,7 +40,8 @@ def run_single_eval(args, method, layer_idx, alpha, mode):
         tokenizer=args.tokenizer,
         steering_vec=steering_vec,
         layer_idx=layer_idx,
-        alpha=alpha
+        alpha=alpha,
+        dataset_name=args.dataset_name
     )
 
     return {
@@ -66,7 +67,7 @@ def main(args):
     args.dataset = dataset
 
     print("Evaluating base model (no steering)...")
-    acc_base, probs_base, labels_base = evaluate(dataset, model, tokenizer)
+    acc_base, probs_base, labels_base = evaluate(dataset, model, tokenizer, dataset_name=args.dataset_name)
     print(f"\nBase model accuracy: {acc_base:.4f}")
 
     results = [{
