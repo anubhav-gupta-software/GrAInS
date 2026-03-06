@@ -1,4 +1,14 @@
 #!/bin/bash
+#
+# Differences from paper (base ~55% vs paper 34%, steered ~68% vs paper 47%; improvement +13% matches):
+#
+# 1. INPUT: We use full TruthfulQA prompt from config (Appendix C). Paper may use shorter
+#    "Q: {question}\nA:" for MC eval. Longer prompt may raises base accuracy.
+#
+# 2. STEERING: We use first 50 samples (indices 0-49) for steering vectors; paper randomly
+#    samples 50. We use fixed sequential split (50 steer / 77 dev / 690 test); paper uses
+#    random 10/90 split of remaining 767. Different splits/samples can shift absolute numbers.
+#
 
 # Set default values
 DATASET_NAME="truthfulqa"
