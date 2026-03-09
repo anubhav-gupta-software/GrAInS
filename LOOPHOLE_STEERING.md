@@ -4,6 +4,24 @@ This document describes the adaptation of GrAInS for **loophole suppression** in
 
 ---
 
+## Quick Start
+
+Run from the `src/` directory:
+
+```bash
+cd src
+
+# Step 1: Token ablation (~30-60 min)
+bash scripts/loophole/run_token_ablation_loophole.sh
+
+# Step 2: Steering MC evaluation
+bash scripts/loophole/run_steering_mc_loophole.sh
+```
+
+**Dataset:** `power_scenarios.csv` in project root. **Outputs:** `data/llm/hidden_states/`, `results/llm/loophole_steering/`
+
+---
+
 ## Motivation
 
 When given instructions, LLMs can exhibit three behaviors:
