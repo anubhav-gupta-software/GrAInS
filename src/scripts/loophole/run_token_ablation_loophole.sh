@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Single GPU avoids device_map fragmentation; 48GB is enough for Llama-8B fp16
+export CUDA_VISIBLE_DEVICES=0
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+
 # ============================================================
 # Step 1: Token ablation for loophole suppression
 # Computes gradient attribution and extracts hidden states

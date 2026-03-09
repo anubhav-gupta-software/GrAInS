@@ -2,6 +2,7 @@ import os
 import argparse
 import random
 
+import torch
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -115,6 +116,9 @@ def main(args):
         })
 
         all_records.append({k: v for k, v in result.items() if not k.startswith("hidden_")})
+
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
 
     # Save hidden states
     os.makedirs(args.output_path_hidden, exist_ok=True)

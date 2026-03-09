@@ -18,7 +18,7 @@ def load_llm_model_and_tokenizer(model_name):
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
-        torch_dtype=torch.float32,
+        torch_dtype=torch.float16,
         device_map="auto",
     )
     tokenizer.pad_token = tokenizer.eos_token
