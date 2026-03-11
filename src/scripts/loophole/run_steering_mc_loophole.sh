@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Single GPU to avoid OOM
+export CUDA_VISIBLE_DEVICES=0
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+
 # ============================================================
 # Step 2: Steering MC evaluation for loophole suppression
 # Measures loophole selection rate before/after steering
@@ -29,7 +33,7 @@ ALPHAS=(1.0 2.0 4.0)
 OUTPUT_DIR="results/llm/loophole_steering"
 STEERING_VECTOR_DIR="data/llm/steering_vectors"
 
-python3 steering_mc_loophole.py
+python3 steering_mc_loophole.py \
   --csv_path "$CSV_PATH" \
   --model_name "$MODEL_NAME" \
   --num_samples "$NUM_SAMPLES" \
