@@ -12,19 +12,19 @@ from accelerate import Accelerator
 
 def load_llm_model_and_tokenizer(model_name):
     """
-    Load a language model and tokenizer with accelerator support.
+    Load a language model and tokenizer.
+    Uses device_map to avoid accelerator.prepare() which can OOM when it re-moves
+    an already GPU-placed model.
     """
-    accelerator = Accelerator()
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         torch_dtype=torch.float16,
-        device_map="auto",
+        device_map="cuda:0",
     )
     tokenizer.pad_token = tokenizer.eos_token
     model.config.pad_token_id = tokenizer.pad_token_id
     model.eval()
-    model, tokenizer = accelerator.prepare(model, tokenizer)
     return model, tokenizer
 
 
