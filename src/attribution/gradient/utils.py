@@ -164,6 +164,8 @@ def apply_integrated_gradients_contrastive(
         return log_p_pos - log_p_neg
 
     ig = IntegratedGradients(contrastive_fn)
-    attributions = ig.attribute(joint_input, baselines=baseline, n_steps=steps)
+    # Use internal._batch_size to prevent OOM by chunking the interpolation steps.
+    # Batch size 2 is very safe for 48GB VRAM with Llama 3.1 8B.
+    attributions = ig.attribute(joint_input, baselines=baseline, n_steps=steps, internal_batch_size=2)
 
     return attributions[:, :T, :][0], attributions[:, T:, :][0]
