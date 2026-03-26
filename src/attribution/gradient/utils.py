@@ -147,11 +147,16 @@ def apply_integrated_gradients_contrastive(
     baseline = torch.zeros_like(joint_input)
 
     def contrastive_fn(joint_embeds):
+        B = joint_embeds.shape[0]
         pos_embed = joint_embeds[:, :T, :]
         neg_embed = joint_embeds[:, T:, :]
 
-        pos_logits = model(inputs_embeds=pos_embed, attention_mask=attention_mask_pos).logits[:, -1, :]
-        neg_logits = model(inputs_embeds=neg_embed, attention_mask=attention_mask_neg).logits[:, -1, :]
+        # Expand attention masks to match batch size (Captum batches interpolation steps)
+        mask_pos = attention_mask_pos.expand(B, -1)
+        mask_neg = attention_mask_neg.expand(B, -1)
+
+        pos_logits = model(inputs_embeds=pos_embed, attention_mask=mask_pos).logits[:, -1, :]
+        neg_logits = model(inputs_embeds=neg_embed, attention_mask=mask_neg).logits[:, -1, :]
 
         log_p_pos = log_softmax(pos_logits, dim=-1)[:, target_token_id_pos]
         log_p_neg = log_softmax(neg_logits, dim=-1)[:, target_token_id_neg]
