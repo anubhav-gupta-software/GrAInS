@@ -19,12 +19,7 @@ from utils.config import MODEL_NAME_MAP
 def run_single_eval(args, method, layer_idx, alpha, mode):
     """Evaluate loophole suppression with a single steering configuration."""
     hidden_states = load_hidden_states(args.hidden_states_path)
-    steering_vec = compute_steering_vector(hidden_states, layer_idx, method)
-
-    if mode == "both":
-        hidden_states_neg = load_hidden_states(args.hidden_states_neg_path)
-        steering_vec_neg = compute_steering_vector(hidden_states_neg, layer_idx, method)
-        steering_vec -= steering_vec_neg
+    steering_vec = compute_steering_vector(hidden_states, layer_idx, method, mode=mode)
 
     os.makedirs(args.steering_vectors_dir, exist_ok=True)
     vec_filename = f"steering_loophole_{args.model_name}_{method}_layer{layer_idx}_alpha{alpha}_{mode}.npy"

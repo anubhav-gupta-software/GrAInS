@@ -17,21 +17,37 @@ def load_hidden_states(hidden_states_path):
     return np.load(hidden_states_path)
 
 
-def compute_steering_vector(hidden_states, layer_idx, method="mean"):
+def compute_steering_vector(hidden_states, layer_idx, method="mean", mode="both"):
     """Compute a steering vector from difference vectors between ablated and non-ablated responses."""
     pos = hidden_states["hidden_pos_response"][:, layer_idx + 1, :]
     neg = hidden_states["hidden_neg_response"][:, layer_idx + 1, :]
     pos_ablated = hidden_states["hidden_pos_response_ablated"][:, layer_idx + 1, :]
     neg_ablated = hidden_states["hidden_neg_response_ablated"][:, layer_idx + 1, :]
 
-    diffs = np.concatenate([pos - pos_ablated, neg - neg_ablated])
+    pos_diffs = pos - pos_ablated
+    neg_diffs = neg - neg_ablated
+
+    if mode == "pos":
+        # Only safe feature direction
+        target_diffs = pos_diffs
+    elif mode == "neg":
+        # Only loophole feature direction
+        target_diffs = neg_diffs
+    else:
+        # Safe direction minus Loophole direction
+        target_diffs = pos_diffs - neg_diffs
 
     if method == "mean":
-        return torch.tensor(diffs.mean(axis=0))
+        return torch.tensor(target_diffs.mean(axis=0))
     elif method == "pca":
         pca = PCA(n_components=1)
-        pca.fit(diffs)
-        return torch.tensor(pca.components_[0])
+        pca.fit(target_diffs)
+        # PCA sign is arbitrary. Ensure it points somewhat in the mean difference direction for stability
+        vec = pca.components_[0]
+        mean_diff = target_diffs.mean(axis=0)
+        if np.dot(vec, mean_diff) < 0:
+            vec = -vec
+        return torch.tensor(vec)
     else:
         raise ValueError("Unknown method. Use 'mean' or 'pca'.")
 
