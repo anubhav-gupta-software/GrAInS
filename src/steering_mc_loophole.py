@@ -123,8 +123,8 @@ if __name__ == "__main__":
 
     parser.add_argument("--mode", nargs="+", default=["both"], help="Steering modes: 'pos' or 'both'")
     parser.add_argument("--methods", nargs="+", default=["pca", "mean"], help="Vector construction methods")
-    parser.add_argument("--layer_idxs", nargs="+", type=int, default=[16, 18, 20, 22, 24, 26, 28, 29, 30, 31])
-    parser.add_argument("--alphas", nargs="+", type=float, default=[0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+    parser.add_argument("--layer_idxs", nargs="+", type=int, default=list(range(10, 32)))
+    parser.add_argument("--alphas", nargs="+", type=float, default=[0.5, 1.0, 1.5, 2.0, 3.0, 4.0, 6.0, 8.0])
 
     args = parser.parse_args()
     main(args)
