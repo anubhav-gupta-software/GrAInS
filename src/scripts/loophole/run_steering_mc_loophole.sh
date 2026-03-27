@@ -26,8 +26,8 @@ HIDDEN_STATES_NEG_PATH="data/llm/hidden_states/hidden_states_power_scenarios_${M
 # Steering search space
 MODES=("both")
 METHODS=("pca" "mean")
-LAYER_IDXS=(28 29 30 31)
-ALPHAS=(1.0 2.0 4.0)
+LAYER_IDXS=(10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31)
+ALPHAS=(0.5 1.0 1.5 2.0 3.0 4.0 6.0 8.0)
 
 # Output
 OUTPUT_DIR="results/llm/loophole_steering"
