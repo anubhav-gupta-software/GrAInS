@@ -33,6 +33,9 @@ def compute_steering_vector(hidden_states, layer_idx, method="mean", mode="both"
     elif mode == "neg":
         # Only loophole feature direction
         target_diffs = neg_diffs
+    elif mode == "neg_away":
+        # Push away from loopholes (negative of loophole direction)
+        target_diffs = -neg_diffs
     else:
         # Safe direction minus Loophole direction
         target_diffs = pos_diffs - neg_diffs
