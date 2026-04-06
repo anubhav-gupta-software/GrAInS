@@ -29,8 +29,7 @@ MODES=("both")
 METHODS=("pca" "mean")
 LAYER_IDXS=(10 11 14 20)
 ALPHAS=(
-  0.01 0.02 0.05 0.075 0.1 0.15 0.2 0.25 0.3 0.4 0.5
-  0.75 1.0 1.25 1.5 1.75 2.0 2.25 2.5 3.0 4.0
+  1.0 1.25 1.5 1.6 1.7 1.75 1.8 1.9 2.0 2.1 2.2 2.25 2.3 2.4 2.5 2.6 2.75 3.0
 )
 
 # Separate folder so this run does not overwrite the full-layer sweep CSV
