@@ -19,7 +19,7 @@ GRAD_METHOD="integrated_gradients"
 OUTPUT_DIR_META="results/llm/token_attribution"
 OUTPUT_DIR_HIDDEN="data/llm/hidden_states"
 
-TOP_K_VALUES=(10)
+TOP_K_VALUES=(5)
 TOP_VALUES=("pos" "neg")
 
 mkdir -p $OUTPUT_DIR_META

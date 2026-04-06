@@ -17,7 +17,7 @@ NUM_SAMPLES="all"
 NUM_SAMPLES_STEER="all"
 ATTRIBUTION="contrastive"
 GRAD_METHOD="integrated_gradients"
-K=10
+K=5
 
 # Paths to hidden states from Step 1
 HIDDEN_STATES_PATH="data/llm/hidden_states/hidden_states_power_scenarios_${MODEL_NAME}_${NUM_SAMPLES_STEER}_${ATTRIBUTION}_${K}_pos_${GRAD_METHOD}.npz"
