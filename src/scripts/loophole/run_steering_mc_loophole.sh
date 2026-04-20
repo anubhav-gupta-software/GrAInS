@@ -9,7 +9,7 @@ export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 # Measures loophole selection rate before/after steering
 # ============================================================
 
-MODEL_NAME="llama-3.1-8b-instruct"
+MODEL_NAME="qwen-2.5-7b-instruct"
 CSV_PATH="../power_scenarios.csv"
 NUM_SAMPLES="all"
 
@@ -17,23 +17,25 @@ NUM_SAMPLES="all"
 NUM_SAMPLES_STEER="all"
 ATTRIBUTION="contrastive"
 GRAD_METHOD="integrated_gradients"
-K=5
+K=10
 
 # Paths to hidden states from Step 1
 HIDDEN_STATES_PATH="data/llm/hidden_states/hidden_states_power_scenarios_${MODEL_NAME}_${NUM_SAMPLES_STEER}_${ATTRIBUTION}_${K}_pos_${GRAD_METHOD}.npz"
 HIDDEN_STATES_NEG_PATH="data/llm/hidden_states/hidden_states_power_scenarios_${MODEL_NAME}_${NUM_SAMPLES_STEER}_${ATTRIBUTION}_${K}_neg_${GRAD_METHOD}.npz"
 
-# Steering search space — focused layers (strong in full sweep) + fine low-α grid
-# Hook uses 10*alpha internally; small alphas (e.g. 0.01) probe very gentle steering.
+# Steering search space — extensive sweep for paper-quality selection
+# Keep mode="both" (safe minus loophole direction) as requested.
 MODES=("both")
 METHODS=("pca" "mean")
-LAYER_IDXS=(10 11 14 20)
+LAYER_IDXS=(10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31)
 ALPHAS=(
-  1.0 1.25 1.5 1.6 1.7 1.75 1.8 1.9 2.0 2.1 2.2 2.25 2.3 2.4 2.5 2.6 2.75 3.0
+  1.0 1.25 1.5 1.6 1.7 1.75 1.8 1.9
+  2.0 2.1 2.2 2.25 2.3 2.4 2.5 2.6
+  2.75 3.0
 )
 
-# Separate folder so this run does not overwrite the full-layer sweep CSV
-OUTPUT_DIR="results/llm/loophole_steering_refine_low_alpha"
+# Separate folder so this run does not overwrite previous sweeps
+OUTPUT_DIR="results/llm/loophole_steering_extensive_qwen_k10"
 STEERING_VECTOR_DIR="data/llm/steering_vectors"
 
 python3 steering_mc_loophole.py \
