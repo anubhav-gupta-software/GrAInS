@@ -27,7 +27,7 @@ HIDDEN_STATES_NEG_PATH="data/llm/hidden_states/hidden_states_power_scenarios_${M
 # Keep mode="both" (safe minus loophole direction) as requested.
 MODES=("both")
 METHODS=("pca" "mean")
-LAYER_IDXS=(10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31)
+LAYER_IDXS=(10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27)
 ALPHAS=(
   1.0 1.25 1.5 1.6 1.7 1.75 1.8 1.9
   2.0 2.1 2.2 2.25 2.3 2.4 2.5 2.6

@@ -18,7 +18,7 @@ from utils.config import MODEL_NAME_MAP
 
 def run_single_eval(args, method, layer_idx, alpha, mode):
     """Evaluate loophole suppression with a single steering configuration."""
-    hidden_states = load_hidden_states(args.hidden_states_path)
+    hidden_states = args.hidden_states
     steering_vec = compute_steering_vector(hidden_states, layer_idx, method, mode=mode)
 
     os.makedirs(args.steering_vectors_dir, exist_ok=True)
@@ -49,6 +49,25 @@ def run_single_eval(args, method, layer_idx, alpha, mode):
 
 
 def main(args):
+    hidden_states = load_hidden_states(args.hidden_states_path)
+    # hidden_pos_response has shape (N, num_hidden_state_slots, hidden_dim),
+    # where index 0 is embeddings and layer i maps to slot i+1.
+    max_layer_idx = hidden_states["hidden_pos_response"].shape[1] - 2
+    valid_layer_idxs = [idx for idx in args.layer_idxs if idx <= max_layer_idx]
+    if not valid_layer_idxs:
+        raise ValueError(
+            f"No valid --layer_idxs for this model. Requested={args.layer_idxs}, "
+            f"but max supported layer index is {max_layer_idx}."
+        )
+    if len(valid_layer_idxs) != len(args.layer_idxs):
+        dropped = sorted(set(args.layer_idxs) - set(valid_layer_idxs))
+        print(
+            f"Warning: dropping out-of-range layer indices {dropped}. "
+            f"Using layers {valid_layer_idxs}."
+        )
+    args.layer_idxs = valid_layer_idxs
+    args.hidden_states = hidden_states
+
     print("Loading model...")
     model, tokenizer = load_llm_model_and_tokenizer(MODEL_NAME_MAP[args.model_name])
 
