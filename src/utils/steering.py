@@ -182,8 +182,37 @@ def steer_and_generate_dataset_vlm(dataset, model, processor, steering_vec,
     return outputs
 
 
+def _choice_log_likelihood(model, tokenizer, prompt, choice):
+    """
+    Compute log p(choice | prompt) by summing token log-probs over all choice tokens.
+    """
+    prompt_ids = tokenizer(prompt, return_tensors="pt")["input_ids"].to(model.device)
+    full_ids = tokenizer(f"{prompt} {choice.strip()}", return_tensors="pt")["input_ids"].to(model.device)
+
+    prompt_len = prompt_ids.shape[1]
+    full_len = full_ids.shape[1]
+
+    # Guard for unexpected tokenization edge-cases.
+    if full_len <= prompt_len:
+        with torch.no_grad():
+            logits = model(full_ids).logits[0, -1]
+            return log_softmax(logits, dim=-1)[full_ids[0, -1].item()].item()
+
+    with torch.no_grad():
+        logits = model(full_ids).logits[0]  # (seq_len, vocab)
+        log_probs = log_softmax(logits, dim=-1)
+
+    # For autoregressive LM, token at position t is scored by logits at t-1.
+    score = 0.0
+    for t in range(prompt_len, full_len):
+        token_id = full_ids[0, t].item()
+        score += log_probs[t - 1, token_id].item()
+
+    return score
+
+
 def evaluate(dataset, model, tokenizer, dataset_name="truthfulqa"):
-    """Compute MC accuracy for LLMs."""
+    """Compute MC accuracy for LLMs using full-choice conditional likelihood."""
     correct, all_probs, all_labels = 0, [], []
 
     for example in tqdm(dataset):
@@ -195,12 +224,7 @@ def evaluate(dataset, model, tokenizer, dataset_name="truthfulqa"):
         scores = []
 
         for choice in choices:
-            full = f"{prompt} {choice.strip()}"
-            input_ids = tokenizer(full, return_tensors="pt").to(model.device)["input_ids"]
-            with torch.no_grad():
-                logits = model(input_ids).logits[0, -1]
-                prob = log_softmax(logits, dim=-1)[input_ids[0, -1].item()].item()
-                scores.append(prob)
+            scores.append(_choice_log_likelihood(model, tokenizer, prompt, choice))
 
         probs = torch.softmax(torch.tensor(scores), dim=0)
         pred = torch.argmax(probs).item()
