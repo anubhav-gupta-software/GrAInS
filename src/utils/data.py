@@ -50,6 +50,38 @@ def load_truthful_qa(num_samples=50, split="validation", offset=0):
     return dataset
 
 
+def load_mmlu(num_samples=1000, split="test", offset=0):
+    """Load samples from MMLU (all subjects) and normalize answer labels."""
+    # CAIS MMLU has configs per subject and "all" for the combined set.
+    dataset = load_dataset("cais/mmlu", "all", split=split)
+
+    if offset > 0:
+        dataset = dataset.select(range(offset, len(dataset)))
+    if num_samples != "all":
+        dataset = dataset.select(range(min(int(num_samples), len(dataset))))
+
+    def _normalize(example):
+        answer = example["answer"]
+        if isinstance(answer, str):
+            answer = answer.strip().upper()
+            if answer in {"A", "B", "C", "D"}:
+                label = ["A", "B", "C", "D"].index(answer)
+            elif answer.isdigit():
+                label = int(answer)
+            else:
+                raise ValueError(f"Unsupported MMLU answer format: {answer}")
+        else:
+            label = int(answer)
+
+        return {
+            "question": example["question"],
+            "choices": example["choices"],
+            "label": label,
+        }
+
+    return dataset.map(_normalize)
+
+
 def load_faitheval(num_samples=50, split="test"):
     """Load samples from the FaithEval dataset."""
     dataset = load_dataset("Salesforce/FaithEval-counterfactual-v1.0", split=split)
@@ -78,6 +110,8 @@ def load_data(dataset_name, num_samples=50, split="validation", offset=0):
     """Generic loader to fetch datasets by name."""
     if dataset_name == "truthfulqa":
         return load_truthful_qa(num_samples=num_samples, split=split, offset=offset)
+    elif dataset_name == "mmlu":
+        return load_mmlu(num_samples=num_samples, split=split, offset=offset)
     elif dataset_name == "power-scenarios":
         csv_path = os.path.join(os.path.dirname(__file__), "..", "..", "power_scenarios.csv")
         return load_power_scenarios(csv_path, num_samples=num_samples)
