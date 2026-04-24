@@ -20,12 +20,7 @@ def run_single_eval(args, method, layer_idx, alpha, mode):
     """Evaluate model with a single steering vector configuration."""
     # Load and compute steering vector
     hidden_states = load_hidden_states(args.hidden_states_path)
-    steering_vec = compute_steering_vector(hidden_states, layer_idx, method)
-
-    if mode == "both":
-        hidden_states_neg = load_hidden_states(args.hidden_states_neg_path)
-        steering_vec_neg = compute_steering_vector(hidden_states_neg, layer_idx, method)
-        steering_vec -= steering_vec_neg
+    steering_vec = compute_steering_vector(hidden_states, layer_idx, method, mode=mode)
 
     # Save steering vector
     os.makedirs(args.steering_vectors_dir, exist_ok=True)
